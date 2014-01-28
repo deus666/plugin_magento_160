@@ -184,7 +184,7 @@ class PayU_Account_Model_Payment extends Mage_Payment_Model_Method_Abstract
                             'Type' => $rate['title'] . ' - ' . $rate['name'],
                             'CountryCode' => $orderCountryCode,
                             'Price' => array(
-                                'Gross' => $this->toAmount($this->_order->getShippingAmount()),
+                                'Gross' => $this->toAmount($this->_order->getShippingInclTax()),
                                 'Net' => $this->toAmount($this->_order->getShippingAmount()),
                                 'Tax' => $this->toAmount($this->_order->getShippingTaxAmount()),
                                 'TaxRate' => $this->toAmount($this->calculateTaxRate()),
@@ -320,8 +320,22 @@ class PayU_Account_Model_Payment extends Mage_Payment_Model_Method_Abstract
 
                 if(!$this->_order->getIsVirtual())
                 {
+                    $street = trim(implode(' ', $shippingAddress->getStreet()));
+                    $houseNumber = $apartmentNumber = '';
+                    if (preg_match('@(\d+[a-zA-Z]{0,2}?)\s*?/?\s*?m*?\.?\s*?(\d+)?$@',$street,$m)) {
+                        if (strpos($m[0],'/')) {
+                            $houseNumber = $m[1];
+                            $apartmentNumber = $m[2];
+                        } else {
+                            $houseNumber = $m[0];
+                        }
+                        $street = str_replace($m[0],'',$street);
+                    }
+
                     $customer_sheet['Shipping'] = array(
-                        'Street' => trim(implode(' ', $shippingAddress->getStreet())),
+                        'Street' => $street,
+                        'HouseNumber' => $houseNumber,
+                        'ApartmentNumber' => $apartmentNumber,
                         'PostalCode' => $shippingAddress->getPostcode(),
                         'City' => $shippingAddress->getCity(),
                         'CountryCode' => $shippingAddress->getCountry(),
