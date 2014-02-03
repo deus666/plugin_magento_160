@@ -206,7 +206,7 @@ class PayU_Account_Model_Payment extends Mage_Payment_Model_Method_Abstract
                         'Type' => $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle(),
                         'CountryCode' => $orderCountryCode,
                         'Price' => array(
-                            'Gross' => $this->toAmount($rate->getPrice()),
+                            'Gross' => $this->toAmount($rate->getPrice() + $this->_order->getShippingTaxAmount()),
                             'Net' => $this->toAmount($rate->getPrice()),
                             'Tax' => $this->toAmount($this->_order->getShippingTaxAmount()),
                             'TaxRate' => $this->toAmount($this->calculateTaxRate()),
@@ -1209,7 +1209,7 @@ class PayU_Account_Model_Payment extends Mage_Payment_Model_Method_Abstract
                         'Type' => $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle(),
                         'CountryCode' => $this->_order->getShippingAddress()->getCountry(),
                         'Price' => array(
-                            'Gross' => $this->toAmount($rate->getPrice() / $factor),
+                            'Gross' => $this->toAmount(($rate->getPrice() / $factor) + $this->_order->getShippingTaxAmount()),
                             'Net' => $this->toAmount($rate->getPrice() / $factor),
                             'Tax' => $this->toAmount($this->_order->getShippingTaxAmount()),
                             'TaxRate' => $this->toAmount($this->calculateTaxRate()),
